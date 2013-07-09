@@ -1,16 +1,15 @@
-<?
-if(Yum::module('message')->messageSystem != YumMessage::MSG_NONE 
-		&& $model->id != Yii::app()->user->id) {
+<?php
 
-echo '<div style="display: none;" id="write_a_message">';
+if (Yum::module('message')->messageSystem != YumMessage::MSG_NONE && $model->id != Yii::app()->user->id) {
 
-	$this->renderPartial(Yum::module()->messageComposeView, array(
-				'model' => new YumMessage,
-				'to_user_id' => $model->id), false, true);
+    echo '<div style="display: none;" id="write_a_message">';
 
-echo '</div>';
+    $this->renderPartial(Yum::module()->messageComposeView, array(
+        'model' => new YumMessage,
+        'to_user_id' => $model->id), false, true);
 
-	echo CHtml::link(Yum::t('Write a message to this User'), '',
-			array('onclick'=>"$('#write_a_message').toggle(500);"));
+    echo '</div>';
+
+    echo CHtml::link(Yum::t('Write a message to this User'), '', array('onclick' => "$('#write_a_message').toggle(500);"));
 }
 ?>

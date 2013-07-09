@@ -1,134 +1,128 @@
-<?
+<?php
+
 Yii::import('application.modules.user.controllers.YumController');
 Yii::import('application.modules.user.models.Yum');
 Yii::import('application.modules.role.models.*');
 Yii::import('application.modules.membership.models.*');
 
 class YumMembershipController extends YumController {
-	public $defaultAction = 'index';
 
-	public function accessRules() {
-		return array(
-				array('allow', 
-					'actions'=>array('index', 'order', 'extend'),
-					'users'=>array('@'),
-					),
-				array('allow', 
-					'actions'=>array('admin','delete', 'update', 'view', 'orders'),
-					'expression' => 'Yii::app()->user->isAdmin()',
-					),
-				array('deny', 
-					'users'=>array('*'),
-					),
-				);
-	}
+    public $defaultAction = 'index';
 
-	public function actionView()
-	{
-		return false;
-	}
+    public function accessRules() {
+        return array(
+            array('allow',
+                'actions' => array('index', 'order', 'extend'),
+                'users' => array('@'),
+            ),
+            array('allow',
+                'actions' => array('admin', 'delete', 'update', 'view', 'orders'),
+                'expression' => 'Yii::app()->user->isAdmin()',
+            ),
+            array('deny',
+                'users' => array('*'),
+            ),
+        );
+    }
 
-	public function actionExtend() {
-		$membership = YumMembership::model()->findByPk($_POST['membership_id']);
-		if(!$membership)
-			throw new CHttpException(404);
+    public function actionView() {
+        return false;
+    }
 
-		if($membership->user_id != Yii::app()->user->id)
-			throw new CHttpException(403);
+    public function actionExtend() {
+        $membership = YumMembership::model()->findByPk($_POST['membership_id']);
+        if (!$membership)
+            throw new CHttpException(404);
 
-		$subscription = $_POST['subscription'];
-		$membership->subscribed = $subscription == 'cancel' ? -1 : $subscription;
-		$membership->save(false, array('subscribed'));
-		Yum::setFlash('Your subscription setting has been saved');
-		$this->redirect(Yum::module('membership')->membershipIndexRoute);
-	}
+        if ($membership->user_id != Yii::app()->user->id)
+            throw new CHttpException(403);
 
-	public function actionUpdate($id = null) {
-		if($id !== null) 
-			$model = YumMembership::model()->findByPk($id);
+        $subscription = $_POST['subscription'];
+        $membership->subscribed = $subscription == 'cancel' ? -1 : $subscription;
+        $membership->save(false, array('subscribed'));
+        Yum::setFlash('Your subscription setting has been saved');
+        $this->redirect(Yum::module('membership')->membershipIndexRoute);
+    }
 
-		if(isset($_POST['YumMembership'])) {
-			$model = YumMembership::model()->findByPk($_POST['YumMembership']['id']); 
-			$model->attributes = $_POST['YumMembership'];
-			if($model->confirmPayment()) 
-				$this->redirect(array('admin'));
-		}
+    public function actionUpdate($id = null) {
+        if ($id !== null)
+            $model = YumMembership::model()->findByPk($id);
 
-		$this->render('update',array(
-					'model'=>$model,
-					));
-	}
+        if (isset($_POST['YumMembership'])) {
+            $model = YumMembership::model()->findByPk($_POST['YumMembership']['id']);
+            $model->attributes = $_POST['YumMembership'];
+            if ($model->confirmPayment())
+                $this->redirect(array('admin'));
+        }
 
-	public function actionOrder()
-	{
-		$model = new YumMembership;
+        $this->render('update', array(
+            'model' => $model,
+        ));
+    }
 
-		if(isset($_POST['YumMembership'])) {
-			$model->attributes = $_POST['YumMembership'];
-			if($model->save()) {
-				$this->redirect(array('index'));
-			}
-		}
+    public function actionOrder() {
+        $model = new YumMembership;
 
-		$this->render('order',array( 'model'=>$model));
-	}
+        if (isset($_POST['YumMembership'])) {
+            $model->attributes = $_POST['YumMembership'];
+            if ($model->save()) {
+                $this->redirect(array('index'));
+            }
+        }
 
-	public function actionDelete()
-	{
-		if(Yii::app()->request->isPostRequest)
-		{
-			$this->loadModel()->delete();
+        $this->render('order', array('model' => $model));
+    }
 
-			if(!isset($_GET['ajax']))
-			{
-				if(isset($_POST['returnUrl']))
-					$this->redirect($_POST['returnUrl']); 
-				else
-					$this->redirect(array('admin'));
-			}
-		}
-		else
-			throw new CHttpException(400,
-					Yii::t('app', 'Invalid request. Please do not repeat this request again.'));
-	}
+    public function actionDelete() {
+        if (Yii::app()->request->isPostRequest) {
+            $this->loadModel()->delete();
 
-	public function actionIndex()
-	{
-		$dataProvider=new CActiveDataProvider('YumMembership', array(
-					'criteria' => array(
-						'condition' => 'user_id = '.Yii::app()->user->id),
-					));
+            if (!isset($_GET['ajax'])) {
+                if (isset($_POST['returnUrl']))
+                    $this->redirect($_POST['returnUrl']);
+                else
+                    $this->redirect(array('admin'));
+            }
+        }
+        else
+            throw new CHttpException(400, Yii::t('app', 'Invalid request. Please do not repeat this request again.'));
+    }
 
-		$this->render('index',array(
-					'dataProvider'=>$dataProvider,
-					));
-	}
+    public function actionIndex() {
+        $dataProvider = new CActiveDataProvider('YumMembership', array(
+            'criteria' => array(
+                'condition' => 'user_id = ' . Yii::app()->user->id),
+        ));
 
-	public function actionOrders()
-	{
-		$model=new YumMembership('search');
-		$model->unsetAttributes();
+        $this->render('index', array(
+            'dataProvider' => $dataProvider,
+        ));
+    }
 
-		if(isset($_GET['YumMembership']))
-			$model->attributes = $_GET['YumMembership'];
+    public function actionOrders() {
+        $model = new YumMembership('search');
+        $model->unsetAttributes();
 
-		$this->render('orders',array(
-					'model'=>$model,
-					));
-	}
+        if (isset($_GET['YumMembership']))
+            $model->attributes = $_GET['YumMembership'];
 
-	public function actionAdmin() {
-		$this->layout = Yum::module()->adminLayout;
+        $this->render('orders', array(
+            'model' => $model,
+        ));
+    }
 
-		$model=new YumMembership('search');
-		$model->unsetAttributes();
+    public function actionAdmin() {
+        $this->layout = Yum::module()->adminLayout;
 
-		if(isset($_GET['YumMembership']))
-			$model->attributes = $_GET['YumMembership'];
+        $model = new YumMembership('search');
+        $model->unsetAttributes();
 
-		$this->render('admin',array(
-					'model'=>$model,
-					));
-	}
+        if (isset($_GET['YumMembership']))
+            $model->attributes = $_GET['YumMembership'];
+
+        $this->render('admin', array(
+            'model' => $model,
+        ));
+    }
 
 }

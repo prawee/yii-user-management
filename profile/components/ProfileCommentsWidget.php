@@ -1,28 +1,30 @@
-<?
+<?php
+
 Yii::import('application.modules.user.UserModule');
 Yii::import('zii.widgets.CPortlet');
 
-class ProfileCommentsWidget extends CPortlet
-{
-	public $decorationCssClass = 'portlet-decoration profilecomments';
+class ProfileCommentsWidget extends CPortlet {
 
-	public function init() {
-		$this->title = Yum::t('Profile Comments');
-		if(Yii::app()->user->isGuest)
-			return false;
+    public $decorationCssClass = 'portlet-decoration profilecomments';
 
-		parent::init();
-	}
+    public function init() {
+        $this->title = Yum::t('Profile Comments');
+        if (Yii::app()->user->isGuest)
+            return false;
 
-	protected function renderContent()
-	{
-		parent::renderContent();
-		if(Yii::app()->user->isGuest)
-			return false;
+        parent::init();
+    }
 
-			$user = YumUser::model()->findByPk(Yii::app()->user->id);
-			$this->render('profile_comments', array(
-						'comments' => Yii::app()->user->data()->profile->recentComments()));
-	}
-} 
+    protected function renderContent() {
+        parent::renderContent();
+        if (Yii::app()->user->isGuest)
+            return false;
+
+        $user = YumUser::model()->findByPk(Yii::app()->user->id);
+        $this->render('profile_comments', array(
+            'comments' => Yii::app()->user->data()->profile->recentComments()));
+    }
+
+}
+
 ?>

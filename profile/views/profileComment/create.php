@@ -1,30 +1,32 @@
 <div class="form">
-<p class="note"> <?php echo Yum::requiredFieldNote(); ?> </p>
+    <p class="note"> <?php echo Yum::requiredFieldNote(); ?> </p>
 
-<?php $form=$this->beginWidget('CActiveForm', array(
-			'id'=>'profile-comment-form',
-			'enableAjaxValidation'=>true,
-			)); 
-echo $form->errorSummary($comment);
+    <?php
+    $form = $this->beginWidget('CActiveForm', array(
+        'id' => 'profile-comment-form',
+        'enableAjaxValidation' => true,
+    ));
+    echo $form->errorSummary($comment);
 
-echo CHtml::hiddenField('YumProfileComment[profile_id]', $profile->id); ?>
+    echo CHtml::hiddenField('YumProfileComment[profile_id]', $profile->id);
+    ?>
 
-<div class="row">
-<?php echo $form->labelEx($comment,'comment'); ?>
-<?php echo $form->textArea($comment,'comment',array('rows'=>6, 'cols'=>50)); ?>
-<?php echo $form->error($comment,'comment'); ?>
-</div>
+    <div class="row">
+        <?php echo $form->labelEx($comment, 'comment'); ?>
+        <?php echo $form->textArea($comment, 'comment', array('rows' => 6, 'cols' => 50)); ?>
+        <?php echo $form->error($comment, 'comment'); ?>
+    </div>
 
-<?
-echo CHtml::Button(Yum::t('Write comment'), array(
-			'id' => 'write_comment',
-			));
+    <?
+    echo CHtml::Button(Yum::t('Write comment'), array(
+        'id' => 'write_comment',
+    ));
 
-Yii::app()->clientScript->registerScript("write_comment", " 
+    Yii::app()->clientScript->registerScript("write_comment", " 
 		$('#write_comment').unbind('click');
 		$('#write_comment').click(function(){
 			jQuery.ajax({'type':'POST',
-				'url':'".$this->createUrl('//profile/comments/create')."',
+				'url':'" . $this->createUrl('//profile/comments/create') . "',
 				'cache':false,
 				'data':jQuery(this).parents('form').serialize(),
 				'success':function(html){
@@ -34,6 +36,7 @@ Yii::app()->clientScript->registerScript("write_comment", "
 		");
 
 
-$this->endWidget(); ?>
+    $this->endWidget();
+    ?>
 
 </div>

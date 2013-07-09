@@ -1,33 +1,35 @@
-<?
+<?php
+
 Yii::import('application.modules.user.UserModule');
 Yii::import('zii.widgets.CPortlet');
 
-class ProfileVisitWidget extends CPortlet
-{
-	public $decorationCssClass = 'portlet-decoration profilevisits';
+class ProfileVisitWidget extends CPortlet {
 
-	public function init() {
-		if(!Yum::module('profile')->enableProfileVisitLogging)
-			return false;
+    public $decorationCssClass = 'portlet-decoration profilevisits';
 
-		$this->title=Yum::t('Profile visits');
-		if(Yii::app()->user->isGuest)
-			return false;
+    public function init() {
+        if (!Yum::module('profile')->enableProfileVisitLogging)
+            return false;
 
-		parent::init();
-	}
+        $this->title = Yum::t('Profile visits');
+        if (Yii::app()->user->isGuest)
+            return false;
 
-	protected function renderContent()
-	{
-		if(!Yum::module('profile')->enableProfileVisitLogging)
-			return false;
+        parent::init();
+    }
 
-		parent::renderContent();
-		if(Yii::app()->user->isGuest)
-			return false;
+    protected function renderContent() {
+        if (!Yum::module('profile')->enableProfileVisitLogging)
+            return false;
 
-			$this->render('profile_visits', array(
-						'visits' => Yii::app()->user->data()->visits));
-	}
-} 
+        parent::renderContent();
+        if (Yii::app()->user->isGuest)
+            return false;
+
+        $this->render('profile_visits', array(
+            'visits' => Yii::app()->user->data()->visits));
+    }
+
+}
+
 ?>

@@ -1,78 +1,75 @@
-<?
+<?php
 
 Yii::import('application.modules.user.controllers.YumController');
 Yii::import('application.modules.user.models.Yum');
 Yii::import('application.modules.profile.models.*');
 
-class YumPrivacysettingController extends YumController
-{
-	public function accessRules()
-	{
-		return array(
-				array('allow', 
-					'actions'=>array('update'),
-					'users'=>array('@'),
-					),
-				array('deny', 
-					'users'=>array('*'),
-					),
-				);
-	}
+class YumPrivacysettingController extends YumController {
 
-	public function beforeAction($action) {
-		if(!Yum::module('profile')->enablePrivacySetting)
-			throw new CHttpException(404);
+    public function accessRules() {
+        return array(
+            array('allow',
+                'actions' => array('update'),
+                'users' => array('@'),
+            ),
+            array('deny',
+                'users' => array('*'),
+            ),
+        );
+    }
 
-		return parent::beforeAction($action);
-	}
+    public function beforeAction($action) {
+        if (!Yum::module('profile')->enablePrivacySetting)
+            throw new CHttpException(404);
 
-	public function actionUpdate() {
-		$model = YumPrivacySetting::model()->findByPk(Yii::app()->user->id);
+        return parent::beforeAction($action);
+    }
 
-		if(isset($_POST['YumPrivacysetting'])) {
-			$model->attributes = $_POST['YumPrivacysetting'];
+    public function actionUpdate() {
+        $model = YumPrivacySetting::model()->findByPk(Yii::app()->user->id);
 
-			$profile_privacy = 0;
-			foreach($_POST as $key => $value) {
-				if($value == 1 && substr($key, 0, 18) == 'privacy_for_field_') {
-					$data = explode('_', $key);
-					$data = (int) $data[3];
-					$profile_privacy += $data;
-				}
-			}
+        if (isset($_POST['YumPrivacysetting'])) {
+            $model->attributes = $_POST['YumPrivacysetting'];
 
-			$model->public_profile_fields = $profile_privacy;
-			$model->validate();
+            $profile_privacy = 0;
+            foreach ($_POST as $key => $value) {
+                if ($value == 1 && substr($key, 0, 18) == 'privacy_for_field_') {
+                    $data = explode('_', $key);
+                    $data = (int) $data[3];
+                    $profile_privacy += $data;
+                }
+            }
 
-		if(isset($_POST['YumProfile'])) {
-			$profile = $model->user->profile;
-			$profile->attributes = $_POST['YumProfile'];
-			$profile->validate();
-			}
+            $model->public_profile_fields = $profile_privacy;
+            $model->validate();
 
-			if(!$model->hasErrors()) {
-				$profile->save();
-				$model->save();
-				Yum::setFlash('Your privacy settings have been saved');
-				$this->redirect(array('//profile/profile/view', 'id' => $model->user_id));
-			}
-		}
+            if (isset($_POST['YumProfile'])) {
+                $profile = $model->user->profile;
+                $profile->attributes = $_POST['YumProfile'];
+                $profile->validate();
+            }
 
-		// If the user does not have a privacy setting entry yet, create an
-		// empty one
-		if(!$model) {
-			$model = new YumPrivacySetting();
-			$model->user_id = Yii::app()->user->id;
-			$model->save();
-			$this->refresh();
-		}
+            if (!$model->hasErrors()) {
+                $profile->save();
+                $model->save();
+                Yum::setFlash('Your privacy settings have been saved');
+                $this->redirect(array('//profile/profile/view', 'id' => $model->user_id));
+            }
+        }
 
-		$this->render(Yum::module('profile')->privacySettingView,array(
-					'model'=>$model,
-					'profile'=> isset($model->user) && isset($model->user->profile)
-					? $model->user->profile 
-					: null
-					));
-	}
+        // If the user does not have a privacy setting entry yet, create an
+        // empty one
+        if (!$model) {
+            $model = new YumPrivacySetting();
+            $model->user_id = Yii::app()->user->id;
+            $model->save();
+            $this->refresh();
+        }
+
+        $this->render(Yum::module('profile')->privacySettingView, array(
+            'model' => $model,
+            'profile' => isset($model->user) && isset($model->user->profile) ? $model->user->profile : null
+        ));
+    }
 
 }

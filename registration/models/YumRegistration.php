@@ -1,5 +1,4 @@
-<?
-
+<?php
 class YumRegistration extends YumActiveRecord {
 	const REG_DISABLED = 0;
 	const REG_SIMPLE = 1;

@@ -1,4 +1,4 @@
-<?
+<?php
 if(!$profile = @$model->profile)
 	return false;
 
